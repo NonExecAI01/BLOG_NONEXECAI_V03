@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Corporate Governance Insights | Non-Exec AI Blog</title>
+  <meta name="description" content="Expert insights on AI corporate governance, boardroom technology, digital board members, and data-driven strategic leadership from Non-Exec AI." />
+  <meta name="keywords" content="AI corporate governance, digital board member, boardroom AI software, AI board advisory, corporate governance technology, executive decision-making AI" />
+  <meta name="author" content="Non-Exec AI Editorial Team" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="https://www.non-exec.ai/blog/" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="AI Corporate Governance Insights | Non-Exec AI Blog" />
+  <meta property="og:description" content="Expert insights on AI corporate governance, boardroom technology, digital board members, and data-driven strategic leadership." />
+  <meta property="og:url" content="https://www.non-exec.ai/blog/" />
+  <meta property="og:site_name" content="Non-Exec AI" />
+  <meta property="og:image" content="https://www.non-exec.ai/blog/assets/og-image.png" />
+  <meta property="og:locale" content="en_GB" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="AI Corporate Governance Insights | Non-Exec AI Blog" />
+  <meta name="twitter:description" content="Expert insights on AI corporate governance, boardroom technology, and data-driven strategic leadership." />
+  <meta name="twitter:image" content="https://www.non-exec.ai/blog/assets/og-image.png" />
+
+  <!-- Schema.org Blog -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    "name": "Non-Exec AI Insights",
+    "description": "Expert insights on AI corporate governance, boardroom technology, and data-driven strategic leadership for board directors and executives.",
+    "url": "https://www.non-exec.ai/blog/",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Non-Exec AI",
+      "url": "https://www.non-exec.ai/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://www.non-exec.ai/blog/assets/logo.png"
+      }
+    },
+    "inLanguage": "en-GB"
+  }
+  </script>
+
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:    #186496;
+      --teal:    #4bbaba;
+      --grey:    #9a9e9f;
+      --grey-lt: #f4f6f8;
+      --grey-bd: #e2e5e8;
+      --dark:    #1a2332;
+      --white:   #ffffff;
+      --radius:  8px;
+      --shadow:  0 2px 12px rgba(24, 100, 150, 0.10);
+      --shadow-h:0 6px 24px rgba(24, 100, 150, 0.18);
+      --font:    'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+      --max-w:   1200px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--grey-lt);
+      color: var(--dark);
+      line-height: 1.6;
+      font-size: 16px;
+    }
+
+    /* ─── Typography ───────────────────────────────────────────────────── */
+    h1, h2, h3, h4 { font-weight: 700; line-height: 1.25; color: var(--dark); }
+    h1 { font-size: clamp(1.75rem, 4vw, 2.5rem); }
+    h2 { font-size: clamp(1.35rem, 3vw, 1.85rem); }
+    h3 { font-size: clamp(1.05rem, 2.5vw, 1.25rem); }
+    a { color: var(--blue); text-decoration: none; transition: color .2s; }
+    a:hover { color: var(--teal); }
+
+    /* ─── Layout Helpers ───────────────────────────────────────────────── */
+    .container { max-width: var(--max-w); margin: 0 auto; padding: 0 1.5rem; }
+
+    /* ─── Skip Nav ─────────────────────────────────────────────────────── */
+    .skip-nav {
+      position: absolute; top: -9999px; left: 1rem; padding: .5rem 1rem;
+      background: var(--blue); color: var(--white); border-radius: var(--radius);
+      z-index: 9999; font-size: .875rem;
+    }
+    .skip-nav:focus { top: 1rem; }
+
+    /* ─── Header ───────────────────────────────────────────────────────── */
+    .site-header {
+      background: var(--blue);
+      color: var(--white);
+      padding: 0;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      max-width: var(--max-w);
+      margin: 0 auto;
+      gap: 1rem;
+    }
+    .site-logo {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      text-decoration: none;
+    }
+    .logo-mark {
+      width: 38px; height: 38px;
+      background: var(--teal);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1rem; color: var(--white);
+      flex-shrink: 0;
+    }
+    .logo-text { color: var(--white); }
+    .logo-text strong { display: block; font-size: 1.125rem; font-weight: 700; letter-spacing: -.01em; }
+    .logo-text span { display: block; font-size: .72rem; color: rgba(255,255,255,.75); letter-spacing: .04em; text-transform: uppercase; }
+
+    .header-nav { display: flex; align-items: center; gap: 1.5rem; }
+    .header-nav a {
+      color: rgba(255,255,255,.85);
+      font-size: .875rem;
+      font-weight: 500;
+      letter-spacing: .02em;
+      transition: color .2s;
+    }
+    .header-nav a:hover { color: var(--teal); }
+
+    .btn-cta {
+      background: var(--teal);
+      color: var(--white) !important;
+      padding: .5rem 1.25rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: .875rem;
+      white-space: nowrap;
+      transition: background .2s, transform .1s;
+    }
+    .btn-cta:hover { background: #3aa8a8; transform: translateY(-1px); }
+
+    /* ─── Hero Banner ──────────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, var(--blue) 0%, #0e4a73 60%, #0a3555 100%);
+      color: var(--white);
+      padding: 4rem 1.5rem 3.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%234bbaba' fill-opacity='0.06'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      opacity: .4;
+    }
+    .hero-content { position: relative; max-width: 780px; margin: 0 auto; }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(75, 186, 186, .2);
+      border: 1px solid rgba(75, 186, 186, .4);
+      color: var(--teal);
+      font-size: .8rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: .35rem .9rem;
+      border-radius: 50px;
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 { color: var(--white); margin-bottom: 1rem; }
+    .hero p {
+      font-size: 1.125rem;
+      color: rgba(255,255,255,.8);
+      max-width: 580px;
+      margin: 0 auto 1.75rem;
+    }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      gap: 2.5rem;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(255,255,255,.12);
+    }
+    .stat { text-align: center; }
+    .stat-num { display: block; font-size: 1.75rem; font-weight: 800; color: var(--teal); line-height: 1; }
+    .stat-lbl { font-size: .78rem; color: rgba(255,255,255,.65); letter-spacing: .04em; text-transform: uppercase; margin-top: .3rem; }
+
+    /* ─── Main Content ─────────────────────────────────────────────────── */
+    main { padding: 3.5rem 0 4rem; }
+
+    /* ─── Section Headers ──────────────────────────────────────────────── */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .section-title-wrap { display: flex; align-items: center; gap: .75rem; }
+    .section-badge {
+      background: var(--teal);
+      color: var(--white);
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: .25rem .65rem;
+      border-radius: 50px;
+    }
+    .section-badge.archived { background: var(--grey); }
+    .section-title { color: var(--blue); }
+    .section-link {
+      font-size: .875rem;
+      font-weight: 600;
+      color: var(--blue);
+      display: flex; align-items: center; gap: .35rem;
+    }
+    .section-link::after { content: '→'; transition: transform .2s; }
+    .section-link:hover::after { transform: translateX(4px); }
+
+    /* ─── Blog Grid ────────────────────────────────────────────────────── */
+    .blog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 1.5rem;
+    }
+
+    /* ─── Blog Card ────────────────────────────────────────────────────── */
+    .blog-card {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+      border: 1px solid var(--grey-bd);
+      transition: box-shadow .25s, transform .25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .blog-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--blue), var(--teal));
+    }
+    .blog-card:hover {
+      box-shadow: var(--shadow-h);
+      transform: translateY(-3px);
+    }
+    .card-category {
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--teal);
+    }
+    .card-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+    .card-title a { color: var(--dark); }
+    .card-title a:hover { color: var(--blue); }
+    .card-excerpt {
+      font-size: .875rem;
+      color: #4a5568;
+      line-height: 1.6;
+      flex: 1;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+    .card-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: .75rem;
+      border-top: 1px solid var(--grey-bd);
+      margin-top: auto;
+      gap: .5rem;
+    }
+    .card-date {
+      font-size: .75rem;
+      color: var(--grey);
+      font-weight: 500;
+    }
+    .card-link {
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--blue);
+      display: flex; align-items: center; gap: .25rem;
+      white-space: nowrap;
+    }
+    .card-link::after { content: '→'; transition: transform .2s; }
+    .card-link:hover { color: var(--teal); }
+    .card-link:hover::after { transform: translateX(3px); }
+
+    /* ─── Section Divider ──────────────────────────────────────────────── */
+    .section-divider { height: 1px; background: var(--grey-bd); margin: 3rem 0; }
+
+    /* ─── Archived Section ─────────────────────────────────────────────── */
+    #archived-section { }
+
+    /* ─── Archive Grid: smaller cards ─────────────────────────────────── */
+    #archived-blogs-grid .blog-card { padding: 1.35rem; }
+    #archived-blogs-grid .blog-card::before { height: 2px; }
+    #archived-blogs-grid .card-title { font-size: .95rem; }
+    #archived-blogs-grid .card-excerpt { -webkit-line-clamp: 2; }
+
+    /* ─── Newsletter CTA ────────────────────────────────────────────────── */
+    .newsletter-cta {
+      background: linear-gradient(135deg, var(--blue), #0e4a73);
+      border-radius: var(--radius);
+      padding: 3rem 2.5rem;
+      text-align: center;
+      color: var(--white);
+      margin: 3rem 0 0;
+    }
+    .newsletter-cta h2 { color: var(--white); margin-bottom: .75rem; }
+    .newsletter-cta p { color: rgba(255,255,255,.8); margin-bottom: 1.5rem; max-width: 520px; margin-left: auto; margin-right: auto; }
+    .newsletter-cta .btn-cta { display: inline-block; padding: .75rem 2rem; font-size: 1rem; }
+
+    /* ─── Footer ────────────────────────────────────────────────────────── */
+    .site-footer {
+      background: var(--dark);
+      color: rgba(255,255,255,.65);
+      padding: 2.5rem 1.5rem;
+    }
+    .footer-inner {
+      max-width: var(--max-w);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .footer-brand { display: flex; align-items: center; gap: .6rem; }
+    .footer-brand .logo-mark { width: 30px; height: 30px; font-size: .8rem; }
+    .footer-brand span { color: var(--white); font-weight: 600; font-size: .9rem; }
+    .footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .footer-links a { color: rgba(255,255,255,.6); font-size: .8rem; transition: color .2s; }
+    .footer-links a:hover { color: var(--teal); }
+    .footer-copy { font-size: .75rem; width: 100%; text-align: center; margin-top: .5rem; }
+
+    /* ─── Responsive ────────────────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .header-nav a:not(.btn-cta) { display: none; }
+      .hero { padding: 2.5rem 1.25rem 2rem; }
+      .hero-stats { gap: 1.5rem; }
+      .blog-grid { grid-template-columns: 1fr; }
+      .section-header { flex-direction: column; align-items: flex-start; }
+      .newsletter-cta { padding: 2rem 1.25rem; }
+      .footer-inner { flex-direction: column; align-items: center; text-align: center; }
+    }
+    @media (min-width: 769px) and (max-width: 1024px) {
+      .blog-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <a class="skip-nav" href="#main-content">Skip to main content</a>
+
+  <!-- ═══ HEADER ══════════════════════════════════════════════════════════ -->
+  <header class="site-header" role="banner">
+    <div class="header-inner">
+      <a href="https://www.non-exec.ai/" class="site-logo" aria-label="Non-Exec AI home">
+        <div class="logo-mark" aria-hidden="true">NE</div>
+        <div class="logo-text">
+          <strong>Non-Exec AI</strong>
+          <span>Board Intelligence Platform</span>
+        </div>
+      </a>
+      <nav class="header-nav" aria-label="Primary navigation">
+        <a href="https://www.non-exec.ai/blog/" aria-current="page">Insights</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ═══ HERO ════════════════════════════════════════════════════════════ -->
+  <section class="hero" aria-labelledby="hero-heading">
+    <div class="hero-content">
+      <div class="hero-tag">AI Board Intelligence</div>
+      <h1 id="hero-heading">Corporate Governance Insights<br>Powered by AI</h1>
+      <p>Daily expert analysis on boardroom AI, digital governance, and data-driven strategic leadership — curated for directors and executives.</p>
+      <div class="hero-stats">
+        <div class="stat"><span class="stat-num">Daily</span><span class="stat-lbl">Fresh Articles</span></div>
+        <div class="stat"><span class="stat-num">18+</span><span class="stat-lbl">Governance Topics</span></div>
+        <div class="stat"><span class="stat-num">100%</span><span class="stat-lbl">Board-Focused</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ═══ MAIN ═════════════════════════════════════════════════════════════ -->
+  <main id="main-content" role="main">
+    <div class="container">
+
+      <!-- ── Today's Blogs ─────────────────────────────────────────────── -->
+      <section id="todays-section" aria-labelledby="todays-heading">
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <h2 class="section-title" id="todays-heading">Today's Insights</h2>
+            <span class="section-badge">New</span>
+          </div>
+        </div>
+        <!-- TODAYS-BLOGS-START -->
+        <div class="blog-grid" id="todays-blogs-grid">
+
+          <article class="blog-card" data-slug="ai-corporate-governance-2026-04-20" data-date="2026-04-20">
+            <div class="card-category">AI Corporate Governance</div>
+            <h3 class="card-title"><a href="articles/ai-corporate-governance-2026-04-20.html">How AI Is Redefining Corporate Governance in 2026</a></h3>
+            <p class="card-excerpt">Artificial intelligence is no longer a peripheral tool in the boardroom — it is becoming the connective tissue of modern corporate governance, providing directors with real-time intelligence and unbiased oversight capabilities.</p>
+            <div class="card-meta">
+              <span class="card-date">20 April 2026</span>
+              <a href="articles/ai-corporate-governance-2026-04-20.html" class="card-link" aria-label="Read full article: How AI Is Redefining Corporate Governance in 2026">Read More</a>
+            </div>
+          </article>
+
+          <article class="blog-card" data-slug="digital-board-member-future-2026-04-20" data-date="2026-04-20">
+            <div class="card-category">Digital Board Member</div>
+            <h3 class="card-title"><a href="articles/digital-board-member-future-2026-04-20.html">The Rise of the Digital Board Member: What Directors Must Know</a></h3>
+            <p class="card-excerpt">As organisations embrace digital transformation at pace, board directors face an urgent imperative: adapt to AI-augmented decision-making or risk strategic obsolescence in an increasingly data-driven corporate landscape.</p>
+            <div class="card-meta">
+              <span class="card-date">20 April 2026</span>
+              <a href="articles/digital-board-member-future-2026-04-20.html" class="card-link" aria-label="Read full article: The Rise of the Digital Board Member">Read More</a>
+            </div>
+          </article>
+
+          <article class="blog-card" data-slug="boardroom-ai-software-guide-2026-04-20" data-date="2026-04-20">
+            <div class="card-category">Boardroom AI Software</div>
+            <h3 class="card-title"><a href="articles/boardroom-ai-software-guide-2026-04-20.html">Selecting the Right AI Software for Your Boardroom in 2026</a></h3>
+            <p class="card-excerpt">Not all boardroom AI platforms are created equal. This guide breaks down the critical evaluation criteria for selecting AI governance software that genuinely enhances director oversight and strategic foresight.</p>
+            <div class="card-meta">
+              <span class="card-date">20 April 2026</span>
+              <a href="articles/boardroom-ai-software-guide-2026-04-20.html" class="card-link" aria-label="Read full article: Selecting the Right AI Software for Your Boardroom">Read More</a>
+            </div>
+          </article>
+
+          <article class="blog-card" data-slug="ai-risk-mitigation-board-2026-04-20" data-date="2026-04-20">
+            <div class="card-category">AI Risk Mitigation</div>
+            <h3 class="card-title"><a href="articles/ai-risk-mitigation-board-2026-04-20.html">AI-Powered Risk Mitigation: A Board Director's Framework</a></h3>
+            <p class="card-excerpt">Enterprise risk is evolving faster than traditional board oversight can track. Discover how AI-driven risk intelligence platforms are giving boards the foresight to identify, assess, and mitigate threats before they materialise.</p>
+            <div class="card-meta">
+              <span class="card-date">20 April 2026</span>
+              <a href="articles/ai-risk-mitigation-board-2026-04-20.html" class="card-link" aria-label="Read full article: AI-Powered Risk Mitigation Framework">Read More</a>
+            </div>
+          </article>
+
+        </div>
+        <!-- TODAYS-BLOGS-END -->
+      </section>
+
+      <div class="section-divider" role="separator"></div>
+
+      <!-- ── Archived Blogs ─────────────────────────────────────────────── -->
+      <section id="archived-section" aria-labelledby="archived-heading">
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <h2 class="section-title" id="archived-heading">Archived Insights</h2>
+            <span class="section-badge archived">Archive</span>
+          </div>
+        </div>
+        <!-- ARCHIVED-BLOGS-START -->
+        <div class="blog-grid" id="archived-blogs-grid">
+          <!-- Archived articles are inserted here by generate_newsletter.py -->
+        </div>
+        <!-- ARCHIVED-BLOGS-END -->
+      </section>
+
+      <!-- ── CTA ──────────────────────────────────────────────────────────── -->
+      <aside class="newsletter-cta" aria-label="Platform call to action">
+        <h2>Experience AI-Powered Board Intelligence</h2>
+        <p>Join forward-thinking boards already using Non-Exec AI to make faster, smarter, and more informed governance decisions.</p>
+        <a href="https://www.non-exec.ai/" class="btn-cta">Explore the Platform</a>
+      </aside>
+
+    </div>
+  </main>
+
+  <!-- ═══ FOOTER ══════════════════════════════════════════════════════════ -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="logo-mark" aria-hidden="true">NE</div>
+        <span>Non-Exec AI</span>
+      </div>
+    </div>
+  </footer>
+
+  <!-- iframe resizer target script (loaded when embedded in iframe) -->
+  <script>
+    if (window.self !== window.top) {
+      // Running inside an iframe — send height to parent
+      function sendHeight() {
+        const h = document.documentElement.scrollHeight;
+        window.parent.postMessage({ type: 'nonexecai-resize', height: h }, '*');
+      }
+      sendHeight();
+      window.addEventListener('resize', sendHeight);
+      const ro = new ResizeObserver(sendHeight);
+      ro.observe(document.body);
+    }
+  </script>
+
+</body>
+</html>

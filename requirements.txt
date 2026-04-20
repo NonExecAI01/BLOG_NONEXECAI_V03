@@ -1,0 +1,17 @@
+# Non-Exec AI Blog Generator — Python Dependencies
+# Install with: pip install -r requirements.txt
+
+# OpenAI API client (v1.x — required for json_object response_format)
+openai>=1.30.0,<2.0.0
+
+# HTML parsing (article card extraction and index.html updates)
+beautifulsoup4>=4.12.0,<5.0.0
+lxml>=5.0.0                  # Faster, more robust HTML parser for BeautifulSoup
+
+# URL-safe slug generation
+python-slugify>=8.0.0,<9.0.0
+
+# HTTP requests (used by openai client; pinned for security)
+requests>=2.31.0,<3.0.0
+
+# Python 3.11+ is required (uses list[str] type hints, match statements, etc.)

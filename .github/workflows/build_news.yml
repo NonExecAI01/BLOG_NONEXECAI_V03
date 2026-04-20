@@ -1,0 +1,132 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Non-Exec AI — Daily Blog Generator & GitHub Pages Deployment
+# ─────────────────────────────────────────────────────────────────────────────
+# Triggers:
+#   • schedule  — Every day at 06:00 UTC (article generation + deploy)
+#   • push/main — On every manual push to main (deploy only, no generation)
+#   • workflow_dispatch — Manual trigger with optional force-generate flag
+#
+# Required GitHub Secrets (Settings → Secrets and variables → Actions):
+#   OPENAI_API_KEY   Your OpenAI API key
+#   SITE_URL         Full base URL of the blog
+#                    e.g. https://yourusername.github.io/non-exec-ai-blog
+# ─────────────────────────────────────────────────────────────────────────────
+
+name: Daily Blog Generation & Deploy
+
+on:
+  schedule:
+    - cron: '0 6 * * *'       # 06:00 UTC every day
+
+  push:
+    branches:
+      - main                   # Deploy on every push to main
+
+  workflow_dispatch:
+    inputs:
+      force_generate:
+        description: 'Force article generation even on manual run'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+# Allow only one concurrent deployment; cancel any in-progress run
+concurrency:
+  group: pages-deploy
+  cancel-in-progress: true
+
+# Permissions needed for committing back to main + deploying GitHub Pages
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+jobs:
+  # ───────────────────────────────────────────────────────────────────────────
+  generate-and-deploy:
+  # ───────────────────────────────────────────────────────────────────────────
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      # 1 ── Checkout ────────────────────────────────────────────────────────
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          # Use the default GITHUB_TOKEN — pushes from this token do NOT
+          # re-trigger the push workflow, preventing infinite loops.
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0          # Full history needed for accurate git log
+
+      # 2 ── Python setup ────────────────────────────────────────────────────
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      # 3 ── Install dependencies ────────────────────────────────────────────
+      - name: Install Python dependencies
+        run: pip install --upgrade pip && pip install -r requirements.txt
+
+      # 4 ── Generate articles ───────────────────────────────────────────────
+      # Only run the generator on:
+      #   • Scheduled runs (automatic daily)
+      #   • workflow_dispatch when force_generate == 'true'
+      # On a plain push to main we skip generation (deploy only).
+      - name: Generate daily articles
+        if: >
+          github.event_name == 'schedule' ||
+          (github.event_name == 'workflow_dispatch' &&
+           github.event.inputs.force_generate == 'true')
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SITE_URL:       ${{ secrets.SITE_URL }}
+        run: |
+          echo "▶ Running article generator for $(date -u '+%Y-%m-%d')…"
+          python generate_newsletter.py
+          echo "✅ Generator finished."
+
+      # 5 ── Commit generated files ──────────────────────────────────────────
+      - name: Commit & push generated files
+        if: >
+          github.event_name == 'schedule' ||
+          (github.event_name == 'workflow_dispatch' &&
+           github.event.inputs.force_generate == 'true')
+        run: |
+          git config --global user.name  "NonExecAI Bot"
+          git config --global user.email "bot@non-exec.ai"
+
+          # Stage index.html and the articles/ directory
+          git add index.html articles/
+
+          # Only commit if there are actual changes
+          if git diff --staged --quiet; then
+            echo "ℹ No file changes detected — skipping commit."
+          else
+            DATE=$(date -u '+%Y-%m-%d')
+            git commit -m "🤖 Daily blog update: ${DATE} [skip ci]"
+            git push origin main
+            echo "✅ Changes pushed to main."
+          fi
+
+      # 6 ── Configure GitHub Pages ──────────────────────────────────────────
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      # 7 ── Upload Pages artifact (entire repo root) ────────────────────────
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Deploy the entire repo root so all HTML files and assets are served
+          path: '.'
+
+      # 8 ── Deploy to GitHub Pages ──────────────────────────────────────────
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
