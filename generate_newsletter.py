@@ -10,7 +10,7 @@ individual article HTML files, and updates index.html by:
 Environment variables (set as GitHub Secrets):
   GEMINI_API_KEY   — Required. Your OpenAI API key.
   SITE_URL         — Optional. Base URL for canonical links.
-                     Defaults to https://etakodev.github.io/non-exec-ai-blog
+                     Defaults to https://nonexecai01.github.io/BLOG_NONEXECAI_V03
 ──────────────────────────────────────────────────────────────────────────────
 """
 
@@ -42,7 +42,7 @@ log = logging.getLogger(__name__)
 
 # ── Constants ─────────────────────────────────────────────────────────────────
 GEMINI_API_KEY   = os.environ.get("GEMINI_API_KEY", "")
-SITE_URL         = os.environ.get("SITE_URL", "http://localhost:3000").rstrip("/")
+SITE_URL         = os.environ.get("SITE_URL", "https://nonexecai01.github.io/BLOG_NONEXECAI_V03").rstrip("/")
 MODEL            = "gemini-2.5-flash"
 GEMINI_BASE_URL  = "https://generativelanguage.googleapis.com/v1beta/openai/"
 ARTICLES_DIR     = Path("articles")

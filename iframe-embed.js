@@ -25,7 +25,7 @@
   /* ── Configuration ──────────────────────────────────────────────────────── */
   var CONFIG = {
     // URL of the blog page to embed
-    blogUrl: 'https://etakodev.github.io/non-exec-ai-blog/',
+    blogUrl: 'https://nonexecai01.github.io/BLOG_NONEXECAI_V03/',
 
     // CSS selector for the host container (falls back to body append)
     containerId: 'nonexecai-blog',
