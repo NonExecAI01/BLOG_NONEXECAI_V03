@@ -10,6 +10,9 @@ import os
 import webbrowser
 from functools import partial
 
+from dotenv import load_dotenv
+load_dotenv()
+
 PORT = 3000
 DIRECTORY = os.path.dirname(os.path.abspath(__file__))
 

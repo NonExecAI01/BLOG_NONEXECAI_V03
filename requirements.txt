@@ -14,6 +14,9 @@ python-slugify>=8.0.0,<9.0.0
 # HTTP requests (used by openai client; pinned for security)
 requests>=2.31.0,<3.0.0
 
+# Loads secrets from .env file for local development
+python-dotenv>=1.0.0
+
 # Resilient JSON parsing — repairs truncated/malformed model responses
 json-repair>=0.30.0
 

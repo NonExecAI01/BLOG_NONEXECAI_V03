@@ -25,9 +25,12 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
 from json_repair import repair_json
 from openai import OpenAI
 from slugify import slugify
+
+load_dotenv()
 
 # ── Logging ──────────────────────────────────────────────────────────────────
 logging.basicConfig(
