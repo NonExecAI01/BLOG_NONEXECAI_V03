@@ -25,6 +25,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from bs4 import BeautifulSoup
+from json_repair import repair_json
 from openai import OpenAI
 from slugify import slugify
 
@@ -135,9 +136,13 @@ def generate_article_data(topic: str, date_str: str) -> dict:
     try:
         data = json.loads(raw)
     except json.JSONDecodeError as exc:
-        log.error("Failed to parse JSON from model response: %s", exc)
-        log.debug("Raw response: %s", raw)
-        raise
+        log.warning("JSON parse failed (%s) — attempting repair.", exc)
+        try:
+            data = json.loads(repair_json(raw))
+        except Exception as repair_exc:
+            log.error("JSON repair also failed: %s", repair_exc)
+            log.debug("Raw response: %s", raw)
+            raise exc
 
     # Sanitise / guarantee required fields
     data.setdefault("slug", slugify(data.get("title", topic)))
