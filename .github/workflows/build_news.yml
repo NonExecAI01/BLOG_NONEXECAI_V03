@@ -2,12 +2,12 @@
 # Non-Exec AI — Daily Blog Generator & GitHub Pages Deployment
 # ─────────────────────────────────────────────────────────────────────────────
 # Triggers:
-#   • schedule  — Every day at 06:00 UTC (article generation + deploy)
-#   • push/main — On every manual push to main (deploy only, no generation)
+#   • schedule         — Every day at 06:00 UTC (article generation + deploy)
+#   • push/main        — On every push to main (article generation + deploy)
 #   • workflow_dispatch — Manual trigger with optional force-generate flag
 #
 # Required GitHub Secrets (Settings → Secrets and variables → Actions):
-#   GEMINI_API_KEY   Your OpenAI API key
+#   GEMINI_API_KEY   Your Gemini API key
 #   SITE_URL         Full base URL of the blog
 #                    e.g. https://yourusername.github.io/non-exec-ai-blog
 # ─────────────────────────────────────────────────────────────────────────────
@@ -75,13 +75,14 @@ jobs:
         run: pip install --upgrade pip && pip install -r requirements.txt
 
       # 4 ── Generate articles ───────────────────────────────────────────────
-      # Only run the generator on:
+      # Run the generator on:
       #   • Scheduled runs (automatic daily)
+      #   • Push to main
       #   • workflow_dispatch when force_generate == 'true'
-      # On a plain push to main we skip generation (deploy only).
       - name: Generate daily articles
         if: >
           github.event_name == 'schedule' ||
+          github.event_name == 'push' ||
           (github.event_name == 'workflow_dispatch' &&
            github.event.inputs.force_generate == 'true')
         env:
@@ -96,6 +97,7 @@ jobs:
       - name: Commit & push generated files
         if: >
           github.event_name == 'schedule' ||
+          github.event_name == 'push' ||
           (github.event_name == 'workflow_dispatch' &&
            github.event.inputs.force_generate == 'true')
         run: |
