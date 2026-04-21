@@ -239,7 +239,7 @@
     /* ─── Blog Grid ────────────────────────────────────────────────────── */
     .blog-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      grid-template-columns: repeat(2, 1fr);
       gap: 1.5rem;
     }
 
@@ -373,9 +373,6 @@
       .section-header { flex-direction: column; align-items: flex-start; }
       .newsletter-cta { padding: 2rem 1.25rem; }
       .footer-inner { flex-direction: column; align-items: center; text-align: center; }
-    }
-    @media (min-width: 769px) and (max-width: 1024px) {
-      .blog-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
 </head>
