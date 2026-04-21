@@ -7,7 +7,7 @@
 #   • workflow_dispatch — Manual trigger with optional force-generate flag
 #
 # Required GitHub Secrets (Settings → Secrets and variables → Actions):
-#   OPENAI_API_KEY   Your OpenAI API key
+#   GEMINI_API_KEY   Your OpenAI API key
 #   SITE_URL         Full base URL of the blog
 #                    e.g. https://yourusername.github.io/non-exec-ai-blog
 # ─────────────────────────────────────────────────────────────────────────────
@@ -85,7 +85,7 @@ jobs:
           (github.event_name == 'workflow_dispatch' &&
            github.event.inputs.force_generate == 'true')
         env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SITE_URL:       ${{ secrets.SITE_URL }}
         run: |
           echo "▶ Running article generator for $(date -u '+%Y-%m-%d')…"

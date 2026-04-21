@@ -8,7 +8,7 @@ individual article HTML files, and updates index.html by:
   2. Inserting 4 brand-new cards into "Today's Blogs"
 
 Environment variables (set as GitHub Secrets):
-  OPENAI_API_KEY   — Required. Your OpenAI API key.
+  GEMINI_API_KEY   — Required. Your OpenAI API key.
   SITE_URL         — Optional. Base URL for canonical links.
                      Defaults to https://etakodev.github.io/non-exec-ai-blog
 ──────────────────────────────────────────────────────────────────────────────
@@ -37,8 +37,8 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # ── Constants ─────────────────────────────────────────────────────────────────
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY", "")
-SITE_URL       = os.environ.get("SITE_URL", "https://etakodev.github.io/non-exec-ai-blog").rstrip("/")
+GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
+SITE_URL       = os.environ.get("SITE_URL", "http://localhost:3000").rstrip("/")
 MODEL          = "gpt-4o-mini"
 ARTICLES_DIR   = Path("articles")
 INDEX_FILE     = Path("index.html")
@@ -66,11 +66,11 @@ TOPICS = [
 ]
 
 # ── OpenAI client ─────────────────────────────────────────────────────────────
-if not OPENAI_API_KEY:
-    log.error("OPENAI_API_KEY environment variable is not set. Aborting.")
+if not GEMINI_API_KEY:
+    log.error("GEMINI_API_KEY environment variable is not set. Aborting.")
     sys.exit(1)
 
-client = OpenAI(api_key=OPENAI_API_KEY)
+client = OpenAI(api_key=GEMINI_API_KEY)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
