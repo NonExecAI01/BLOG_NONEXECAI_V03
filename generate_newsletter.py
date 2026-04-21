@@ -37,11 +37,12 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 # ── Constants ─────────────────────────────────────────────────────────────────
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "")
-SITE_URL       = os.environ.get("SITE_URL", "http://localhost:3000").rstrip("/")
-MODEL          = "gpt-4o-mini"
-ARTICLES_DIR   = Path("articles")
-INDEX_FILE     = Path("index.html")
+GEMINI_API_KEY   = os.environ.get("GEMINI_API_KEY", "")
+SITE_URL         = os.environ.get("SITE_URL", "http://localhost:3000").rstrip("/")
+MODEL            = "gemini-2.5-flash"
+GEMINI_BASE_URL  = "https://generativelanguage.googleapis.com/v1beta/openai/"
+ARTICLES_DIR     = Path("articles")
+INDEX_FILE       = Path("index.html")
 ARTICLES_PER_DAY = 4
 
 TOPICS = [
@@ -65,12 +66,12 @@ TOPICS = [
     "Corporate governance technology",
 ]
 
-# ── OpenAI client ─────────────────────────────────────────────────────────────
+# ── Gemini client (OpenAI-compatible endpoint) ────────────────────────────────
 if not GEMINI_API_KEY:
     log.error("GEMINI_API_KEY environment variable is not set. Aborting.")
     sys.exit(1)
 
-client = OpenAI(api_key=GEMINI_API_KEY)
+client = OpenAI(api_key=GEMINI_API_KEY, base_url=GEMINI_BASE_URL)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -127,7 +128,7 @@ def generate_article_data(topic: str, date_str: str) -> dict:
         messages=[{"role": "user", "content": prompt}],
         response_format={"type": "json_object"},
         temperature=0.72,
-        max_tokens=2800,
+        max_tokens=8192,
     )
 
     raw = response.choices[0].message.content
