@@ -2,7 +2,7 @@
 # Non-Exec AI — Daily Blog Generator & GitHub Pages Deployment
 # ─────────────────────────────────────────────────────────────────────────────
 # Triggers:
-#   • schedule         — Every day at 06:00 UTC (article generation + deploy)
+#   • schedule         — Every day at 06:07 UTC (article generation + deploy)
 #   • push/main        — On every push to main (article generation + deploy)
 #   • workflow_dispatch — Manual trigger with optional force-generate flag
 #
@@ -16,7 +16,7 @@ name: Daily Blog Generation & Deploy
 
 on:
   schedule:
-    - cron: '0 6 * * *'       # 06:00 UTC every day
+    - cron: '7 6 * * *'       # 06:07 UTC every day (offset avoids top-of-hour GitHub Actions congestion)
 
   push:
     branches:
