@@ -53,6 +53,17 @@ jobs:
           GOVERNANCE_PHASE: ${{ github.event.inputs.phase || 'auto' }}
         run: python run_governance_phase.py
 
+      - name: Check Cursor quota and alert if tokens exhausted
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          ALERT_FROM_EMAIL: ${{ secrets.ALERT_FROM_EMAIL }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+        run: python notify_spend_limit.py --check
+        continue-on-error: true
+
       - name: Commit governance outputs
         run: |
           git config --global user.name  "NonExecAI Governance Bot"

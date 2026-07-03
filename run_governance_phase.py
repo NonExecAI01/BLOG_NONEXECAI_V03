@@ -83,6 +83,14 @@ def main() -> int:
     print(f"Governance phase: {phase}")
     print(f"Registry entries: {count}")
     print(f"Cost logged. Daily total: USD {day_total:.2f}")
+
+    try:
+        from notify_spend_limit import check_and_notify
+
+        check_and_notify()
+    except Exception as exc:
+        print(f"Quota alert check skipped: {exc}")
+
     return 0
 
 

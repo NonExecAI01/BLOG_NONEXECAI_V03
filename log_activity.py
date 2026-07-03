@@ -160,6 +160,13 @@ def append_unified_entry(
         now=now,
     )
 
+    try:
+        from notify_spend_limit import check_and_notify
+
+        check_and_notify(dry_run=False)
+    except Exception:
+        pass
+
     return line.strip()
 
 
