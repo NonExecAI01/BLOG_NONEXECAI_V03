@@ -54,7 +54,7 @@ jobs:
         run: |
           git config --global user.name  "NonExecAI Governance Bot"
           git config --global user.email "bot@non-exec.ai"
-          git add "NonExecAI Cost Cycling/.spend-limit-alert-state.json" automation/cursor-account.json 2>/dev/null || true
+          git add "NonExecAI Cost Cycling/.spend-limit-alert-state.json" automation/cursor-account.json automation/CURSOR-SPEND-LIMIT-NOTE.md .cursor/rules/spend-limit-alert.mdc 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No alert state changes."
           else

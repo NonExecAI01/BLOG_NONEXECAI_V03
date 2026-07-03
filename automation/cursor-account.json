@@ -29,6 +29,11 @@
     ],
     "subject": "INCREASE SPEND LIMIT ON CURSOR",
     "message": "INCREASE SPEND LIMIT ON CURSOR",
-    "from_email": "Non-Exec.AI Alerts <alerts@non-exec.ai>"
+    "from_email": "Non-Exec.AI Alerts <alerts@non-exec.ai>",
+    "cursor_fallback": {
+      "rule": ".cursor/rules/spend-limit-alert.mdc",
+      "note": "automation/CURSOR-SPEND-LIMIT-NOTE.md",
+      "always_when_exhausted": true
+    }
   }
 }
