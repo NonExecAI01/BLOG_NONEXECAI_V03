@@ -1,26 +1,24 @@
 # Governance Authority Agent — GitHub Actions runner
-# Runs at 00:00, 06:00, 12:00, 18:00 UTC when Cursor Cloud Automations are not yet saved.
+# Runs at 06:00 and 16:00 UTC when Cursor Cloud Automations are not yet saved.
 # Primary automation: import prefills from aimodelpromptneai/automation/prefill/
 
 name: Governance Authority Agent
 
 on:
   schedule:
-    - cron: '0 0,6,12,18 * * *'
+    - cron: '0 6,16 * * *'
 
   workflow_dispatch:
     inputs:
       phase:
-        description: 'Force phase (DAWN, NOON, DUSK, MIDNIGHT) or auto from UTC hour'
+        description: 'Force phase (DAWN, AFTERNOON) or auto from UTC hour'
         required: false
         default: 'auto'
         type: choice
         options:
           - auto
           - DAWN
-          - NOON
-          - DUSK
-          - MIDNIGHT
+          - AFTERNOON
 
 concurrency:
   group: governance-authority

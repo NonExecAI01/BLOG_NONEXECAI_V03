@@ -10,10 +10,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 PHASES = [
-    (0, "MIDNIGHT"),
     (6, "DAWN"),
-    (12, "NOON"),
-    (18, "DUSK"),
+    (16, "AFTERNOON"),
 ]
 
 ROOT = Path(__file__).resolve().parent
@@ -23,7 +21,7 @@ RUN_LOG = ROOT / "meta" / "run-log.md"
 
 def current_phase(now: datetime | None = None) -> str:
     forced = os.environ.get("GOVERNANCE_PHASE", "auto").upper()
-    if forced in {"DAWN", "NOON", "DUSK", "MIDNIGHT"}:
+    if forced in {"DAWN", "AFTERNOON"}:
         return forced
     hour = (now or datetime.now(timezone.utc)).hour
     phase = "MIDNIGHT"

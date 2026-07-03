@@ -1,6 +1,6 @@
 {
   "currency": "USD",
-  "note": "Estimated per-run costs for prompt cycling. Update when Cursor pricing changes. Cursor runs use configured model; GitHub Actions uses Gemini.",
+  "note": "Estimated per-run costs. Schedule: 06:00 + 16:00 GMT (DAWN + AFTERNOON).",
   "runners": {
     "cursor-cloud": "Cursor Cloud Agent automation",
     "github-actions": "GitHub Actions governance runner (Gemini)"
@@ -17,16 +17,12 @@
   },
   "phase_model_map": {
     "odd": {
-      "MIDNIGHT": "composer-2.5-fast",
-      "DAWN": "claude-opus-4-8-thinking-high",
-      "NOON": "gpt-5.5-medium",
-      "DUSK": "claude-fable-5-thinking-high"
+      "DAWN": "composer-2.5-fast",
+      "AFTERNOON": "claude-opus-4-8-thinking-high"
     },
     "even": {
-      "MIDNIGHT": "claude-sonnet-5-thinking-high",
-      "DAWN": "claude-4.6-sonnet-medium-thinking",
-      "NOON": "gpt-5.3-codex",
-      "DUSK": "composer-2.5-fast"
+      "DAWN": "gpt-5.5-medium",
+      "AFTERNOON": "claude-fable-5-thinking-high"
     }
   }
 }
