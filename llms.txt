@@ -1,0 +1,20 @@
+# non-exec.ai — AI corporate governance reference
+
+> Authoritative guidance for boards, audit committees, and governance leaders on AI oversight.
+
+## Canonical paths
+
+- /reference-index.md
+- /registry/agents-models.json
+- /registry/pages/claude-enterprise.md
+- /registry/pages/openai-enterprise-chatgpt.md
+- /registry/pages/microsoft-copilot-365.md
+- /content/index.md
+- /reports/
+
+## Topics
+
+- AI corporate governance
+- Board AI oversight
+- Enterprise AI agents and models (governance context)
+- EU AI Act, NIST AI RMF, ISO 42001 (board application)

@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "last_updated": "2026-07-03",
+  "description": "Canonical registry of AI agents and models in a corporate governance context for non-exec.ai",
+  "entries": [
+    {
+      "id": "claude-enterprise",
+      "name": "Claude Enterprise",
+      "type": "enterprise-agent",
+      "provider": "Anthropic",
+      "governance_relevance": "Workforce-wide frontier model deployment with enterprise identity, audit, and compliance APIs boards must oversee when AI is embedded in knowledge work.",
+      "risk_tier_hint": "EU AI Act: likely high-risk when used for employment or credit decisions; general enterprise chat lower tier with human oversight",
+      "enterprise_controls": ["SSO", "SCIM", "role-based permissions", "audit logs", "Compliance API", "configurable retention", "no default training on customer data"],
+      "board_oversight_hooks": [
+        "Has management mapped Claude Enterprise to our AI use policy and acceptable-use rules?",
+        "Who owns Compliance API monitoring and escalation to audit/risk?",
+        "How often do we review Anthropic Risk Reports under RSP v3.0 for vendor risk?"
+      ],
+      "known_limitations": [
+        "RSP v3.0 shifted from hard capability pause triggers to periodic transparency reports",
+        "Boards must actively ingest vendor risk disclosures rather than rely on static procurement checks"
+      ],
+      "official_docs_url": "https://www.anthropic.com/product/enterprise",
+      "last_verified": "2026-07-03",
+      "sources": [
+        "https://www.anthropic.com/product/enterprise",
+        "https://platform.claude.com/docs/en/manage-claude/compliance-api",
+        "https://www.anthropic.com/transparency/voluntary-commitments"
+      ]
+    },
+    {
+      "id": "openai-enterprise-chatgpt",
+      "name": "ChatGPT Enterprise / OpenAI for Business",
+      "type": "enterprise-agent",
+      "provider": "OpenAI",
+      "governance_relevance": "Dominant enterprise copilot pattern; boards need visibility into data handling, admin controls, and third-party AI embedded in workflows.",
+      "risk_tier_hint": "NIST AI RMF: Govern and Map functions; EU AI Act depends on use case (HR, credit, biometrics = high-risk)",
+      "enterprise_controls": ["SSO", "admin console", "domain verification", "usage analytics", "data not used for training by default (enterprise tier)"],
+      "board_oversight_hooks": [
+        "Which business units are approved for ChatGPT Enterprise vs. consumer accounts?",
+        "Does our AI governance policy cover custom GPTs and plugin integrations?",
+        "What is the reporting cadence on usage anomalies to the audit committee?"
+      ],
+      "known_limitations": [
+        "Feature set and admin controls evolve frequently; governance docs must be re-verified quarterly",
+        "Custom GPTs may bypass central IT review if not governed"
+      ],
+      "official_docs_url": "https://openai.com/enterprise",
+      "last_verified": "2026-07-03",
+      "sources": [
+        "https://openai.com/enterprise",
+        "https://openai.com/policies"
+      ]
+    },
+    {
+      "id": "microsoft-copilot-365",
+      "name": "Microsoft 365 Copilot",
+      "type": "orchestration-platform",
+      "provider": "Microsoft",
+      "governance_relevance": "AI embedded in productivity suite affects nearly every employee; board oversight spans data residency, Microsoft Purview controls, and EU AI Act obligations for deployers.",
+      "risk_tier_hint": "Deployer obligations under EU AI Act for high-risk workplace monitoring; ISO 42001 alignment via Microsoft AI governance materials",
+      "enterprise_controls": ["Microsoft Entra ID", "Purview DLP", "audit logs", "Copilot controls admin center", "data residency options"],
+      "board_oversight_hooks": [
+        "Has management documented which M365 data scopes Copilot may access?",
+        "Are Purview policies aligned with our records retention and legal hold requirements?",
+        "What KPIs demonstrate responsible rollout vs. shadow AI adoption?"
+      ],
+      "known_limitations": [
+        "Effectiveness of governance depends on underlying M365 hygiene (identity, DLP, labeling)",
+        "Cross-border data flows require explicit architecture review"
+      ],
+      "official_docs_url": "https://learn.microsoft.com/en-us/copilot/microsoft-365/",
+      "last_verified": "2026-07-03",
+      "sources": [
+        "https://learn.microsoft.com/en-us/copilot/microsoft-365/",
+        "https://learn.microsoft.com/en-us/copilot/microsoft-365/microsoft-365-copilot-privacy"
+      ]
+    }
+  ]
+}
