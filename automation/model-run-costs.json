@@ -1,19 +1,36 @@
 {
+  "cursor_account": "et@edgephone.ai",
+  "cursor_plan": "Pro+",
+  "plan_cost_usd_monthly": 60,
+  "billing_cycle_reset": "2026-07-29",
+  "on_demand_limit_usd": 20,
+  "on_demand_spent_usd": 0,
+  "usage_snapshot_date": "2026-07-03",
+  "usage_included_percent": {
+    "total": 48,
+    "auto": 35,
+    "api": 94
+  },
+  "notes": [
+    "Cursor Automations run on et@edgephone.ai Pro+ account",
+    "API included usage at 94% — monitor on-demand before heavy AFTERNOON Opus runs",
+    "Amortized plan cost per governance run (2/day): ~USD 1.00 included allocation"
+  ],
   "currency": "USD",
-  "note": "Estimated per-run costs. Schedule: 06:00 + 16:00 GMT (DAWN + AFTERNOON).",
+  "schedule": "06:00 + 16:00 GMT (DAWN + AFTERNOON)",
   "runners": {
-    "cursor-cloud": "Cursor Cloud Agent automation",
-    "github-actions": "GitHub Actions governance runner (Gemini)"
+    "cursor-cloud": "Cursor Cloud Agent via et@edgephone.ai",
+    "github-actions": "GitHub Actions (Gemini API key — not Cursor billing)"
   },
   "models": {
-    "composer-2.5-fast": { "label": "Composer 2.5 Fast", "est_usd": 0.15 },
-    "claude-opus-4-8-thinking-high": { "label": "Opus 4.8 High", "est_usd": 1.5 },
-    "gpt-5.5-medium": { "label": "GPT-5.5 Medium", "est_usd": 0.8 },
-    "claude-fable-5-thinking-high": { "label": "Fable 5 High", "est_usd": 1.0 },
-    "claude-sonnet-5-thinking-high": { "label": "Sonnet 5 High", "est_usd": 0.9 },
-    "claude-4.6-sonnet-medium-thinking": { "label": "Sonnet 4.6 Medium", "est_usd": 0.5 },
-    "gpt-5.3-codex": { "label": "Codex 5.3 Medium", "est_usd": 0.7 },
-    "gemini-2.5-flash": { "label": "Gemini 2.5 Flash", "est_usd": 0.02 }
+    "composer-2.5-fast": { "label": "Composer 2.5 Fast", "est_usd": 0.15, "api_weight": "low" },
+    "claude-opus-4-8-thinking-high": { "label": "Opus 4.8 High", "est_usd": 1.5, "api_weight": "high" },
+    "gpt-5.5-medium": { "label": "GPT-5.5 Medium", "est_usd": 0.8, "api_weight": "medium" },
+    "claude-fable-5-thinking-high": { "label": "Fable 5 High", "est_usd": 1.0, "api_weight": "high" },
+    "claude-sonnet-5-thinking-high": { "label": "Sonnet 5 High", "est_usd": 0.9, "api_weight": "medium" },
+    "claude-4.6-sonnet-medium-thinking": { "label": "Sonnet 4.6 Medium", "est_usd": 0.5, "api_weight": "low" },
+    "gpt-5.3-codex": { "label": "Codex 5.3 Medium", "est_usd": 0.7, "api_weight": "medium" },
+    "gemini-2.5-flash": { "label": "Gemini 2.5 Flash", "est_usd": 0.02, "api_weight": "n/a" }
   },
   "phase_model_map": {
     "odd": {
@@ -24,5 +41,6 @@
       "DAWN": "gpt-5.5-medium",
       "AFTERNOON": "claude-fable-5-thinking-high"
     }
-  }
+  },
+  "on_demand_warning_threshold_api_percent": 90
 }

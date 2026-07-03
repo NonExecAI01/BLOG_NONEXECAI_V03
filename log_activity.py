@@ -14,8 +14,44 @@ UNIFIED_LOG = LOG_DIR / "activity-cost-and-prompt-log.txt"
 PROMPT_SOURCE = "automation/prompts/governance-authority-agent.md"
 PROMPT_REPO = "aimodelpromptneai (Cursor prefills: automation/prefill/*.json)"
 COSTS_JSON = ROOT / "automation" / "model-run-costs.json"
+ACCOUNT_JSON = ROOT / "automation" / "cursor-account.json"
 
-PROMPT_SUMMARY = """PROMPT IN USE (master)
+
+def _load_costs() -> dict:
+    if not COSTS_JSON.exists():
+        return {"models": {}, "phase_model_map": {"odd": {}, "even": {}}}
+    return json.loads(COSTS_JSON.read_text(encoding="utf-8"))
+
+
+def _load_account() -> dict:
+    if ACCOUNT_JSON.exists():
+        return json.loads(ACCOUNT_JSON.read_text(encoding="utf-8"))
+    cfg = _load_costs()
+    return {
+        "cursor_account": cfg.get("cursor_account", "et@edgephone.ai"),
+        "cursor_plan": cfg.get("cursor_plan", "Pro+"),
+        "plan_cost_usd_monthly": cfg.get("plan_cost_usd_monthly", 60),
+    }
+
+
+def _build_header() -> str:
+    acct = _load_account()
+    usage = acct.get("usage_included_percent", {})
+    return f"""NonExecAI — Activity, Cost & Prompt Log (single file)
+=====================================================
+All timestamps UTC unless noted.
+Append-only. Open in Notepad.
+
+CURSOR ACCOUNT
+--------------
+Account: {acct.get("cursor_account", "et@edgephone.ai")}
+Plan: {acct.get("cursor_plan", "Pro+")} (USD {acct.get("plan_cost_usd_monthly", 60)}/mo)
+Billing reset: {acct.get("billing_cycle_reset", "n/a")}
+Included usage snapshot ({acct.get("usage_snapshot_date", "n/a")}): total {usage.get("total", "?")}% | auto {usage.get("auto", "?")}% | API {usage.get("api", "?")}%
+On-demand: USD {acct.get("on_demand_spent_usd", 0)}/{acct.get("on_demand_limit_usd", 20)} cap
+NOTE: Cloud Agent automations bill to this account API quota. API at 94% — monitor on-demand.
+
+PROMPT IN USE (master)
 --------------------
 Name: non-exec.ai - Daily Governance Authority Agent
 Source file: automation/prompts/governance-authority-agent.md
@@ -23,31 +59,18 @@ Purpose: Build non-exec.ai as the definitive source for AI corporate governance
          and canonical registry for AI agents/models in a board-governance context.
 
 Schedule (current): 06:00 GMT = DAWN | 16:00 GMT = AFTERNOON
-- DAWN: intelligence scan, gap analysis, dawn reports (no public publish unless critical fixes)
-- AFTERNOON: authoritative content + registry updates + authority signals (audit/briefing/llms.txt)
+- DAWN: intelligence scan, gap analysis, dawn reports
+- AFTERNOON: authoritative content + registry updates + authority signals
 
-Each run binds: model slug, phase codename, UTC hour via automation prefill JSON.
+Each Cursor Cloud run: account={acct.get("cursor_account", "et@edgephone.ai")} via automation/prefill/*.json
 Cost estimates: automation/model-run-costs.json
-"""
 
-HEADER = f"""NonExecAI — Activity, Cost & Prompt Log (single file)
-=====================================================
-All timestamps UTC unless noted.
-Append-only. Open in Notepad.
-
-{PROMPT_SUMMARY}
 RUN ENTRIES
 -----------
 Format:
   [TIMESTAMP] PHASE | MODEL | RUNNER | USD | ACTIVITY | PROMPT
 
 """
-
-
-def _load_costs() -> dict:
-    if not COSTS_JSON.exists():
-        return {"models": {}, "phase_model_map": {"odd": {}, "even": {}}}
-    return json.loads(COSTS_JSON.read_text(encoding="utf-8"))
 
 
 def _day_parity(day: int | None = None) -> str:
@@ -110,14 +133,17 @@ def append_unified_entry(
     note_bit = f" ({notes})" if notes else ""
     activity_clean = activity.replace("\n", " ").strip() + note_bit
 
+    acct = _load_account().get("cursor_account", "et@edgephone.ai")
+    runner_tag = f"{runner}@{acct}" if runner == "cursor-cloud" else runner
+
     line = (
-        f"[{ts}] {phase_u} | {model_label} ({model_slug}) | {runner} | "
+        f"[{ts}] {phase_u} | {model_label} ({model_slug}) | {runner_tag} | "
         f"USD {cost_usd:.2f} | {activity_clean} | PROMPT: {prompt}\n"
     )
 
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     if not UNIFIED_LOG.exists():
-        UNIFIED_LOG.write_text(HEADER, encoding="utf-8")
+        UNIFIED_LOG.write_text(_build_header(), encoding="utf-8")
     with UNIFIED_LOG.open("a", encoding="utf-8") as f:
         f.write(line)
 
@@ -130,7 +156,7 @@ def append_unified_entry(
         model_slug=model_slug,
         model_label=model_label,
         cost_usd=cost_usd,
-        notes=notes,
+        notes=f"{notes}; account={acct}" if runner == "cursor-cloud" and notes else (f"account={acct}" if runner == "cursor-cloud" else notes),
         now=now,
     )
 
@@ -159,7 +185,7 @@ def append_ranking_assessment(assessment_text: str, now: datetime | None = None)
     ts = now.strftime("%Y-%m-%d %H:%M:%S")
     LOG_DIR.mkdir(parents=True, exist_ok=True)
     if not UNIFIED_LOG.exists():
-        UNIFIED_LOG.write_text(HEADER, encoding="utf-8")
+        UNIFIED_LOG.write_text(_build_header(), encoding="utf-8")
     block = f"\n=== AUTHORITY RANKING ASSESSMENT ({ts} UTC) ===\n{assessment_text.strip()}\n=== END ASSESSMENT ===\n\n"
     with UNIFIED_LOG.open("a", encoding="utf-8") as f:
         f.write(block)

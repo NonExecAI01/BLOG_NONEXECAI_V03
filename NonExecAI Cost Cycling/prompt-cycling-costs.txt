@@ -6,3 +6,4 @@ Format: YYYY-MM-DD HH:MM:SS | PHASE | MODEL | RUNNER | USD amount | notes
 2026-07-03 19:50:48 | DUSK | Fable 5 High (claude-fable-5-thinking-high) | cursor-cloud | USD 1.00 | bootstrap DUSK registry run
 2026-07-03 19:51:05 | DUSK | Gemini 2.5 Flash (gemini-2.5-flash) | github-actions | USD 0.02 | workflow_dispatch run 28680663090
 2026-07-03 19:53:38 | DAWN | Gemini 2.5 Flash (gemini-2.5-flash) | github-actions | USD 0.02
+2026-07-03 20:05:55 | DAWN | Gemini 2.5 Flash (gemini-2.5-flash) | github-actions | USD 0.02

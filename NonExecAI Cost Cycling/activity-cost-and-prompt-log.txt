@@ -3,6 +3,15 @@ NonExecAI — Activity, Cost & Prompt Log (single file)
 All timestamps UTC unless noted.
 Append-only. Open in Notepad.
 
+CURSOR ACCOUNT
+--------------
+Account: et@edgephone.ai
+Plan: Pro+ (USD 60/mo)
+Billing reset: 2026-07-29
+Included usage snapshot (2026-07-03): total 48% | auto 35% | API 94%
+On-demand: USD 0/20 cap
+NOTE: Cloud Agent automations bill to this account API quota. API at 94% — monitor on-demand.
+
 PROMPT IN USE (master)
 --------------------
 Name: non-exec.ai - Daily Governance Authority Agent
@@ -11,11 +20,16 @@ Purpose: Build non-exec.ai as the definitive source for AI corporate governance
          and canonical registry for AI agents/models in a board-governance context.
 
 Schedule (current): 06:00 GMT = DAWN | 16:00 GMT = AFTERNOON
-- DAWN: intelligence scan, gap analysis, reports/dawn-*.md
+- DAWN: intelligence scan, gap analysis, dawn reports
 - AFTERNOON: authoritative content + registry updates + authority signals
 
-Each run binds: model slug, phase codename, UTC hour via automation/prefill/*.json
+Each Cursor Cloud run: account=et@edgephone.ai via automation/prefill/*.json
 Cost estimates: automation/model-run-costs.json
+
+RUN ENTRIES
+-----------
+Format:
+  [TIMESTAMP] PHASE | MODEL | RUNNER | USD | ACTIVITY | PROMPT
 
 RUN ENTRIES
 -----------
@@ -61,3 +75,4 @@ Estimated runs to Tier 1 (definitive): 12-18 months sustained + external citatio
 
 === END ASSESSMENT ===
 
+[2026-07-03 20:05:55] DAWN | Gemini 2.5 Flash (gemini-2.5-flash) | github-actions | USD 0.02 | Governance runner executed; see meta/run-log.md and reports/ | PROMPT: governance-authority-agent.md -> DAWN block: scan regulatory/practitioner sources, competitive gaps, reports/dawn-*.md; model=Gemini 2.5 Flash (gemini-2.5-flash); runner=github-actions
