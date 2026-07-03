@@ -1,0 +1,63 @@
+NonExecAI — Activity, Cost & Prompt Log (single file)
+=====================================================
+All timestamps UTC unless noted.
+Append-only. Open in Notepad.
+
+PROMPT IN USE (master)
+--------------------
+Name: non-exec.ai - Daily Governance Authority Agent
+Source file: automation/prompts/governance-authority-agent.md
+Purpose: Build non-exec.ai as the definitive source for AI corporate governance
+         and canonical registry for AI agents/models in a board-governance context.
+
+Schedule (current): 06:00 GMT = DAWN | 16:00 GMT = AFTERNOON
+- DAWN: intelligence scan, gap analysis, reports/dawn-*.md
+- AFTERNOON: authoritative content + registry updates + authority signals
+
+Each run binds: model slug, phase codename, UTC hour via automation/prefill/*.json
+Cost estimates: automation/model-run-costs.json
+
+RUN ENTRIES
+-----------
+Format:
+  [TIMESTAMP] PHASE | MODEL | RUNNER | USD | ACTIVITY | PROMPT
+
+[2026-07-03 19:50:48] DUSK | Fable 5 High (claude-fable-5-thinking-high) | cursor-cloud | USD 1.00 | Bootstrap registry: 3 enterprise entries (Claude Enterprise, ChatGPT Enterprise, M365 Copilot); registry/pages, CHANGELOG, reports/dusk-2026-07-03.md | PROMPT: governance-authority-agent.md -> DUSK block: registry + cross-linking; model=Fable 5 High; runner=cursor-cloud
+
+[2026-07-03 19:51:05] DUSK | Gemini 2.5 Flash (gemini-2.5-flash) | github-actions | USD 0.02 | GitHub Actions governance workflow_dispatch run 28680663090 | PROMPT: governance-authority-agent.md -> DUSK block; model=Gemini 2.5 Flash; runner=github-actions
+
+[2026-07-03 19:53:38] DAWN | Gemini 2.5 Flash (gemini-2.5-flash) | github-actions | USD 0.02 | Cost logger test run | PROMPT: governance-authority-agent.md -> DAWN block: scan regulatory/practitioner sources, competitive gaps, reports/dawn-*.md; model=Gemini 2.5 Flash; runner=github-actions
+
+[2026-07-03 20:01:00] SETUP | n/a | manual | USD 0.00 | Schedule changed to 06:00 + 16:00 GMT twice daily; 4 Cursor prefills regenerated; unified log created | PROMPT: governance-authority-agent.md (DAWN + AFTERNOON phases)
+
+=== AUTHORITY RANKING ASSESSMENT (2026-07-03 20:01:00 UTC) ===
+
+OVERALL RANK (AI corporate governance): Tier 5 / Not yet authoritative — early-stage (est. bottom 15% of intended peer set)
+
+Scoring (1=leading, 5=minimal presence):
+  Content depth & pillars     : 5/5 gap  (1 blog-style article set; no pillar library)
+  Reference registry          : 4/5 gap  (3 entries started 2026-07-03; peers have 100+)
+  Search visibility           : 5/5 gap  (no indexed governance hub; landing page only)
+  Machine-readable authority  : 3/5 gap  (llms.txt added; no MCP/API/agent-manifest yet)
+  Framework crosswalks        : 5/5 gap  (NIST/EU AI Act/ISO mapping not published)
+  Board-practitioner citations: 5/5 gap  (not cited by Diligent, PwC, board institutes)
+  Product/app authority       : 2/5 gap  (Non-Exec.AI app exists; blog/registry separate)
+
+Peer benchmark (definitive-tier targets):
+  - Alpha Governance (alphagovernance.ai): IVO ratings, AGR, llms.txt, MCP, OpenAPI — Tier 1
+  - Diligent / PwC / board institutes: practitioner briefs, committee playbooks — Tier 1
+  - AIQA Global: quantitative AIQ Score methodology — Tier 1 infrastructure
+  - non-exec.ai today: tagline + app + nascent registry — Tier 5
+
+Path to definitive (priority order):
+  1. Publish 7 pillar pages (Foundations, Structures, Frameworks, Oversight, Agents, Regulatory, Glossary)
+  2. Expand registry to 25+ verified entries with board oversight hooks
+  3. Weekly governance briefing + reference-index as citable hub
+  4. SEO/indexing: sitemap, schema.org, internal link graph blog <-> registry
+  5. llms.txt + structured JSON API for agent citation (match Alpha pattern)
+
+Estimated runs to Tier 3 (citable niche source): ~60 AFTERNOON runs at current pace
+Estimated runs to Tier 1 (definitive): 12-18 months sustained + external citations
+
+=== END ASSESSMENT ===
+
