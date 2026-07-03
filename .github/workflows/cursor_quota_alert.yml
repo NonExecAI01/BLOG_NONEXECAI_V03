@@ -1,5 +1,5 @@
-# Alert when Cursor API tokens or on-demand spend limit is exhausted.
-# Emails et@edgephone.ai and et@non-exec.ai with: INCREASE SPEND LIMIT ON CURSOR
+# Cursor-only alert when API tokens or on-demand spend limit is exhausted.
+# Writes .cursor/rules/spend-limit-alert.mdc — no email.
 
 name: Cursor Quota Alert
 
@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
     inputs:
       force:
-        description: 'Send alert even if already sent this billing cycle'
+        description: 'Rewrite alert even if already active this billing cycle'
         required: false
         default: 'false'
         type: choice
@@ -32,19 +32,8 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-          cache: 'pip'
 
-      - name: Install dependencies
-        run: pip install --upgrade pip && pip install -r requirements.txt
-
-      - name: Check quota and send alert if needed
-        env:
-          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
-          ALERT_FROM_EMAIL: ${{ secrets.ALERT_FROM_EMAIL }}
-          SMTP_HOST: ${{ secrets.SMTP_HOST }}
-          SMTP_PORT: ${{ secrets.SMTP_PORT }}
-          SMTP_USER: ${{ secrets.SMTP_USER }}
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+      - name: Check quota and update Cursor alert
         run: |
           FORCE=""
           if [ "${{ github.event.inputs.force }}" = "true" ]; then FORCE="--force"; fi
@@ -54,7 +43,7 @@ jobs:
         run: |
           git config --global user.name  "NonExecAI Governance Bot"
           git config --global user.email "bot@non-exec.ai"
-          git add "NonExecAI Cost Cycling/.spend-limit-alert-state.json" automation/cursor-account.json automation/CURSOR-SPEND-LIMIT-NOTE.md .cursor/rules/spend-limit-alert.mdc 2>/dev/null || true
+          git add "NonExecAI Cost Cycling/.spend-limit-alert-state.json" automation/cursor-account.json automation/CURSOR-SPEND-LIMIT-NOTE.md automation/CURSOR-SPEND-LIMIT-RESOLVED.md .cursor/rules/spend-limit-alert.mdc .cursor/rules/spend-limit-resolved.mdc 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No alert state changes."
           else

@@ -1,27 +1,25 @@
 #!/usr/bin/env python3
-"""Email alert when Cursor tokens or on-demand spend limit is exhausted."""
+"""Cursor-only alert when tokens or on-demand spend limit is exhausted."""
 
 from __future__ import annotations
 
 import argparse
 import json
 import os
-import smtplib
 import sys
 from datetime import datetime, timezone
-from email.message import EmailMessage
 from pathlib import Path
 from typing import Any
-
-import requests
 
 ROOT = Path(__file__).resolve().parent
 DEFAULT_ACCOUNT_JSON = ROOT / "automation" / "cursor-account.json"
 STATE_FILE = ROOT / "NonExecAI Cost Cycling" / ".spend-limit-alert-state.json"
 CURSOR_RULE_REL = Path(".cursor/rules/spend-limit-alert.mdc")
 CURSOR_NOTE_REL = Path("automation/CURSOR-SPEND-LIMIT-NOTE.md")
-ALERT_MESSAGE = "INCREASE SPEND LIMIT ON CURSOR"
-DEFAULT_RECIPIENTS = ["et@edgephone.ai", "et@non-exec.ai"]
+CURSOR_UNDO_RULE_REL = Path(".cursor/rules/spend-limit-resolved.mdc")
+CURSOR_UNDO_NOTE_REL = Path("automation/CURSOR-SPEND-LIMIT-RESOLVED.md")
+DEFAULT_ALERT_MESSAGE = "INCREASE SPEND LIMIT ON CURSOR"
+DEFAULT_UNDO_MESSAGE = "UNDO - CURSOR SPEND LIMIT RESOLVED"
 
 
 def load_account(path: Path) -> dict[str, Any]:
@@ -41,65 +39,93 @@ def save_state(state: dict[str, Any]) -> None:
     STATE_FILE.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
 
 
-def alert_recipients(account: dict[str, Any]) -> list[str]:
-    alerts = account.get("spend_limit_alerts", {})
-    configured = alerts.get("recipients")
-    if configured:
-        return list(configured)
-    return DEFAULT_RECIPIENTS.copy()
+def alert_config(account: dict[str, Any]) -> dict[str, Any]:
+    return account.get("cursor_alerts") or account.get("spend_limit_alerts") or {}
 
 
-def quota_exhausted(account: dict[str, Any]) -> tuple[bool, str]:
+def alert_message(account: dict[str, Any]) -> str:
+    return alert_config(account).get("message") or DEFAULT_ALERT_MESSAGE
+
+
+def undo_message(account: dict[str, Any]) -> str:
+    return alert_config(account).get("undo_message") or DEFAULT_UNDO_MESSAGE
+
+
+def trigger_thresholds(account: dict[str, Any]) -> dict[str, float]:
+    triggers = alert_config(account).get("trigger") or {}
+    return {
+        "api_percent": float(triggers.get("api_percent", 100)),
+        "total_percent": float(triggers.get("total_percent", 100)),
+        "on_demand_spent_usd": float(
+            triggers.get("on_demand_spent_usd", account.get("on_demand_limit_usd", 20))
+        ),
+    }
+
+
+def undo_thresholds(account: dict[str, Any]) -> dict[str, float]:
+    undo = alert_config(account).get("undo") or {}
+    limit = float(account.get("on_demand_limit_usd", 20))
+    return {
+        "api_percent_below": float(undo.get("api_percent_below", 90)),
+        "total_percent_below": float(undo.get("total_percent_below", 90)),
+        "on_demand_spent_usd_below": float(undo.get("on_demand_spent_usd_below", max(limit - 5, 0))),
+    }
+
+
+def usage_values(account: dict[str, Any]) -> dict[str, float]:
+    usage = account.get("usage_included_percent", {})
+    return {
+        "api": float(usage.get("api", 0)),
+        "total": float(usage.get("total", 0)),
+        "spent": float(account.get("on_demand_spent_usd", 0)),
+        "limit": float(account.get("on_demand_limit_usd", 20)),
+    }
+
+
+def should_alert(account: dict[str, Any]) -> tuple[bool, str]:
     if account.get("tokens_exhausted") is True:
         return True, "tokens_exhausted flag set in cursor-account.json"
 
-    if os.environ.get("CURSOR_TOKENS_EXHAUSTED", "").strip() in {"1", "true", "yes"}:
+    if os.environ.get("CURSOR_TOKENS_EXHAUSTED", "").strip().lower() in {"1", "true", "yes"}:
         return True, "CURSOR_TOKENS_EXHAUSTED environment variable set"
 
-    usage = account.get("usage_included_percent", {})
-    api_pct = float(usage.get("api", 0))
-    total_pct = float(usage.get("total", 0))
-    spent = float(account.get("on_demand_spent_usd", 0))
-    limit = float(account.get("on_demand_limit_usd", 20))
+    values = usage_values(account)
+    thresholds = trigger_thresholds(account)
 
-    if spent >= limit > 0:
-        return True, f"on-demand spend limit reached ({spent:.2f}/{limit:.2f} USD)"
+    if values["spent"] >= thresholds["on_demand_spent_usd"] > 0:
+        return True, f"on-demand spend limit reached ({values['spent']:.2f}/{values['limit']:.2f} USD)"
 
-    included_exhausted = api_pct >= 100 or total_pct >= 100
-    if included_exhausted and limit <= 0:
-        return True, f"included usage exhausted (API {api_pct}%, total {total_pct}%) with no on-demand budget"
+    if values["api"] >= thresholds["api_percent"]:
+        return True, f"API included usage at {values['api']:.0f}% (trigger {thresholds['api_percent']:.0f}%)"
 
-    if included_exhausted and spent >= limit:
+    if values["total"] >= thresholds["total_percent"]:
+        return True, f"total included usage at {values['total']:.0f}% (trigger {thresholds['total_percent']:.0f}%)"
+
+    included_exhausted = values["api"] >= 100 or values["total"] >= 100
+    if included_exhausted and values["limit"] <= 0:
+        return True, "included usage exhausted with no on-demand budget"
+
+    if included_exhausted and values["spent"] >= values["limit"]:
         return True, (
-            f"included usage exhausted (API {api_pct}%, total {total_pct}%) "
-            f"and on-demand cap reached ({spent:.2f}/{limit:.2f} USD)"
+            f"included usage exhausted (API {values['api']:.0f}%, total {values['total']:.0f}%) "
+            f"and on-demand cap reached ({values['spent']:.2f}/{values['limit']:.2f} USD)"
         )
 
     return False, ""
 
 
-def already_alerted(account: dict[str, Any], state: dict[str, Any]) -> bool:
-    billing_reset = account.get("billing_cycle_reset", "")
-    if not billing_reset:
+def should_undo_alert(account: dict[str, Any], state: dict[str, Any]) -> bool:
+    if not state.get("alert_active"):
         return False
-    return state.get("last_alert_billing_reset") == billing_reset
+    if account.get("tokens_exhausted") is True:
+        return False
 
-
-def build_email_body(account: dict[str, Any], reason: str) -> str:
-    usage = account.get("usage_included_percent", {})
-    return "\n".join(
-        [
-            ALERT_MESSAGE,
-            "",
-            f"Account: {account.get('cursor_account', 'et@edgephone.ai')}",
-            f"Plan: {account.get('cursor_plan', 'Pro+')}",
-            f"Billing reset: {account.get('billing_cycle_reset', 'n/a')}",
-            f"Included usage: total {usage.get('total', '?')}% | auto {usage.get('auto', '?')}% | API {usage.get('api', '?')}%",
-            f"On-demand: USD {account.get('on_demand_spent_usd', 0)}/{account.get('on_demand_limit_usd', 20)}",
-            f"Trigger: {reason}",
-            "",
-            "Update usage in automation/cursor-account.json after increasing the Cursor spend limit.",
-        ]
+    values = usage_values(account)
+    undo = undo_thresholds(account)
+    return (
+        values["api"] < undo["api_percent_below"]
+        and values["total"] < undo["total_percent_below"]
+        and values["spent"] < undo["on_demand_spent_usd_below"]
     )
 
 
@@ -113,22 +139,23 @@ def cursor_note_roots(account_path: Path) -> list[Path]:
 
 
 def build_cursor_rule(account: dict[str, Any], reason: str) -> str:
-    usage = account.get("usage_included_percent", {})
+    values = usage_values(account)
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    message = alert_message(account)
     return f"""---
 description: Cursor API tokens or on-demand spend limit exhausted — action required
 alwaysApply: true
 ---
 
-# {ALERT_MESSAGE}
+# {message}
 
 **Action required before running Cloud Agent automations.**
 
 - Account: `{account.get("cursor_account", "et@edgephone.ai")}`
 - Plan: {account.get("cursor_plan", "Pro+")}
 - Billing reset: {account.get("billing_cycle_reset", "n/a")}
-- Included usage: total {usage.get("total", "?")}% | auto {usage.get("auto", "?")}% | API {usage.get("api", "?")}%
-- On-demand: USD {account.get("on_demand_spent_usd", 0)}/{account.get("on_demand_limit_usd", 20)}
+- Included usage: total {values["total"]:.0f}% | API {values["api"]:.0f}%
+- On-demand: USD {values["spent"]:.2f}/{values["limit"]:.2f}
 - Trigger: {reason}
 - Updated: {ts}
 
@@ -141,20 +168,20 @@ Also update `automation/cursor-account.json` usage fields from the Cursor dashbo
 
 
 def build_cursor_note_markdown(account: dict[str, Any], reason: str) -> str:
-    usage = account.get("usage_included_percent", {})
+    values = usage_values(account)
     ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
-    return f"""# {ALERT_MESSAGE}
+    message = alert_message(account)
+    return f"""# {message}
 
-This file is written automatically when Cursor tokens or the on-demand spend cap is exhausted
-and email alerts are unavailable or failed.
+Cursor-only alert (email alerts disabled). Written when tokens or the on-demand spend cap is hit.
 
 | Field | Value |
 |-------|-------|
 | Account | {account.get("cursor_account", "et@edgephone.ai")} |
 | Plan | {account.get("cursor_plan", "Pro+")} |
 | Billing reset | {account.get("billing_cycle_reset", "n/a")} |
-| Included usage | total {usage.get("total", "?")}% / auto {usage.get("auto", "?")}% / API {usage.get("api", "?")}% |
-| On-demand | USD {account.get("on_demand_spent_usd", 0)} / {account.get("on_demand_limit_usd", 20)} |
+| Included usage | total {values["total"]:.0f}% / API {values["api"]:.0f}% |
+| On-demand | USD {values["spent"]:.2f} / {values["limit"]:.2f} |
 | Trigger | {reason} |
 | Updated | {ts} |
 
@@ -165,132 +192,96 @@ and email alerts are unavailable or failed.
 3. Update `automation/cursor-account.json` from the dashboard
 4. Clear this alert: `python notify_spend_limit.py --clear`
 
-Email fallback recipients (when configured): et@edgephone.ai, et@non-exec.ai
+Undo runs automatically when usage drops below undo thresholds in `cursor-account.json`.
 """
 
 
-def write_cursor_notes(account_path: Path, account: dict[str, Any], reason: str) -> list[Path]:
+def build_undo_cursor_rule(account: dict[str, Any]) -> str:
+    values = usage_values(account)
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    message = undo_message(account)
+    return f"""---
+description: Cursor spend limit back within safe range
+alwaysApply: true
+---
+
+# {message}
+
+Cursor usage is back within limits for **{account.get("cursor_account", "et@edgephone.ai")}**.
+
+- Included usage: total {values["total"]:.0f}% | API {values["api"]:.0f}%
+- On-demand: USD {values["spent"]:.2f}/{values["limit"]:.2f}
+- Updated: {ts}
+
+Cloud Agent automations may run again. This resolved notice is removed on the next quota check.
+"""
+
+
+def build_undo_cursor_note(account: dict[str, Any]) -> str:
+    values = usage_values(account)
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    message = undo_message(account)
+    return f"""# {message}
+
+| Field | Value |
+|-------|-------|
+| Account | {account.get("cursor_account", "et@edgephone.ai")} |
+| Included usage | total {values["total"]:.0f}% / API {values["api"]:.0f}% |
+| On-demand | USD {values["spent"]:.2f} / {values["limit"]:.2f} |
+| Updated | {ts} |
+
+No action required. Remove manually with `python notify_spend_limit.py --clear` if still visible.
+"""
+
+
+def _write_paths(account_path: Path, paths: dict[Path, str]) -> list[Path]:
     written: list[Path] = []
-    rule_body = build_cursor_rule(account, reason)
-    note_body = build_cursor_note_markdown(account, reason)
     for root in cursor_note_roots(account_path):
-        rule_path = root / CURSOR_RULE_REL
-        note_path = root / CURSOR_NOTE_REL
-        rule_path.parent.mkdir(parents=True, exist_ok=True)
-        note_path.parent.mkdir(parents=True, exist_ok=True)
-        rule_path.write_text(rule_body, encoding="utf-8")
-        note_path.write_text(note_body, encoding="utf-8")
-        written.extend([rule_path, note_path])
+        for rel, body in paths.items():
+            target = root / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(body, encoding="utf-8")
+            written.append(target)
     return written
 
 
-def clear_cursor_notes(account_path: Path = DEFAULT_ACCOUNT_JSON) -> None:
+def _remove_paths(account_path: Path, rel_paths: list[Path]) -> None:
     for root in cursor_note_roots(account_path):
-        for rel in (CURSOR_RULE_REL, CURSOR_NOTE_REL):
+        for rel in rel_paths:
             path = root / rel
             if path.exists():
                 path.unlink()
 
 
-def email_configured() -> bool:
-    if os.environ.get("RESEND_API_KEY", "").strip():
-        return True
-    return bool(os.environ.get("SMTP_HOST", "").strip())
-
-
-def send_via_resend(
-    *,
-    api_key: str,
-    from_email: str,
-    to: list[str],
-    subject: str,
-    body: str,
-) -> None:
-    response = requests.post(
-        "https://api.resend.com/emails",
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-        },
-        json={
-            "from": from_email,
-            "to": to,
-            "subject": subject,
-            "text": body,
-        },
-        timeout=30,
+def write_cursor_alert(account_path: Path, account: dict[str, Any], reason: str) -> list[Path]:
+    _remove_paths(
+        account_path,
+        [CURSOR_UNDO_RULE_REL, CURSOR_UNDO_NOTE_REL],
     )
-    if response.status_code >= 400:
-        raise RuntimeError(f"Resend API error {response.status_code}: {response.text}")
-
-
-def send_via_smtp(
-    *,
-    host: str,
-    port: int,
-    username: str,
-    password: str,
-    from_email: str,
-    to: list[str],
-    subject: str,
-    body: str,
-    use_tls: bool,
-) -> None:
-    message = EmailMessage()
-    message["From"] = from_email
-    message["To"] = ", ".join(to)
-    message["Subject"] = subject
-    message.set_content(body)
-
-    with smtplib.SMTP(host, port, timeout=30) as smtp:
-        if use_tls:
-            smtp.starttls()
-        if username:
-            smtp.login(username, password)
-        smtp.send_message(message)
-
-
-def send_alert_email(account: dict[str, Any], reason: str) -> list[str]:
-    alerts = account.get("spend_limit_alerts", {})
-    subject = alerts.get("subject", ALERT_MESSAGE)
-    body = build_email_body(account, reason)
-    recipients = alert_recipients(account)
-
-    from_email = (
-        os.environ.get("ALERT_FROM_EMAIL")
-        or os.environ.get("SMTP_FROM")
-        or alerts.get("from_email")
-        or "Non-Exec.AI Alerts <alerts@non-exec.ai>"
+    return _write_paths(
+        account_path,
+        {
+            CURSOR_RULE_REL: build_cursor_rule(account, reason),
+            CURSOR_NOTE_REL: build_cursor_note_markdown(account, reason),
+        },
     )
 
-    resend_key = os.environ.get("RESEND_API_KEY", "").strip()
-    if resend_key:
-        send_via_resend(
-            api_key=resend_key,
-            from_email=from_email,
-            to=recipients,
-            subject=subject,
-            body=body,
-        )
-        return recipients
 
-    smtp_host = os.environ.get("SMTP_HOST", "").strip()
-    if smtp_host:
-        send_via_smtp(
-            host=smtp_host,
-            port=int(os.environ.get("SMTP_PORT", "587")),
-            username=os.environ.get("SMTP_USER", "").strip(),
-            password=os.environ.get("SMTP_PASS", "").strip(),
-            from_email=from_email,
-            to=recipients,
-            subject=subject,
-            body=body,
-            use_tls=os.environ.get("SMTP_USE_TLS", "true").lower() != "false",
-        )
-        return recipients
+def write_cursor_undo(account_path: Path, account: dict[str, Any]) -> list[Path]:
+    _remove_paths(account_path, [CURSOR_RULE_REL, CURSOR_NOTE_REL])
+    return _write_paths(
+        account_path,
+        {
+            CURSOR_UNDO_RULE_REL: build_undo_cursor_rule(account),
+            CURSOR_UNDO_NOTE_REL: build_undo_cursor_note(account),
+        },
+    )
 
-    raise RuntimeError(
-        "No email transport configured. Set RESEND_API_KEY or SMTP_HOST (+ SMTP_USER/SMTP_PASS)."
+
+def clear_all_cursor_notes(account_path: Path = DEFAULT_ACCOUNT_JSON) -> None:
+    _remove_paths(
+        account_path,
+        [CURSOR_RULE_REL, CURSOR_NOTE_REL, CURSOR_UNDO_RULE_REL, CURSOR_UNDO_NOTE_REL],
     )
 
 
@@ -301,68 +292,55 @@ def check_and_notify(
     dry_run: bool = False,
 ) -> int:
     account = load_account(account_path)
-    exhausted, reason = quota_exhausted(account)
-    if not exhausted:
-        clear_cursor_notes(account_path)
+    state = load_state()
+    alert, reason = should_alert(account)
+
+    if not alert and should_undo_alert(account, state):
+        if dry_run:
+            print(f"DRY RUN: would undo Cursor alert — {undo_message(account)}")
+            return 0
+        write_cursor_undo(account_path, account)
+        save_state(
+            {
+                "alert_active": False,
+                "last_undo_at": datetime.now(timezone.utc).isoformat(),
+                "last_undo_billing_reset": account.get("billing_cycle_reset"),
+            }
+        )
+        print(f"Cursor alert undone: {undo_message(account)}")
+        return 0
+
+    if not alert:
+        if state.get("alert_active"):
+            clear_all_cursor_notes(account_path)
+            save_state({"alert_active": False})
+        else:
+            clear_all_cursor_notes(account_path)
         print("Cursor quota OK — no alert needed.")
         return 0
 
-    state = load_state()
     if dry_run:
-        print(f"DRY RUN: quota exhausted — {reason}")
-        print(f"Would write Cursor rule: {CURSOR_RULE_REL}")
-        print(f"Would write Cursor note: {CURSOR_NOTE_REL}")
-        if email_configured():
-            print(f"Would email: {', '.join(alert_recipients(account))}")
-        else:
-            print("Email not configured — Cursor note would be the only alert.")
-        print(f"Subject/body: {ALERT_MESSAGE}")
+        print(f"DRY RUN: would write Cursor alert — {reason}")
+        print(f"Rule: {CURSOR_RULE_REL}")
+        print(f"Note: {CURSOR_NOTE_REL}")
+        print(f"Message: {alert_message(account)}")
         return 0
 
-    note_paths = write_cursor_notes(account_path, account, reason)
-    print(f"Cursor note written ({len(note_paths)} files): {ALERT_MESSAGE}")
-
-    if not force and already_alerted(account, state):
-        print(f"Quota exhausted ({reason}); email already sent this billing cycle.")
+    if not force and state.get("alert_active") and state.get("last_alert_reason") == reason:
+        print(f"Cursor alert already active ({reason}).")
         return 0
 
-    if not email_configured():
-        save_state(
-            {
-                "last_alert_billing_reset": account.get("billing_cycle_reset"),
-                "last_alert_at": datetime.now(timezone.utc).isoformat(),
-                "last_alert_reason": reason,
-                "last_alert_method": "cursor-note",
-            }
-        )
-        print("Email not configured — using Cursor rule + note only.")
-        return 0
-
-    try:
-        sent_to = send_alert_email(account, reason)
-    except Exception as exc:
-        save_state(
-            {
-                "last_alert_billing_reset": account.get("billing_cycle_reset"),
-                "last_alert_at": datetime.now(timezone.utc).isoformat(),
-                "last_alert_reason": reason,
-                "last_alert_method": "cursor-note",
-                "email_error": str(exc),
-            }
-        )
-        print(f"Email failed ({exc}). Cursor note is active.")
-        return 0
-
+    paths = write_cursor_alert(account_path, account, reason)
     save_state(
         {
-            "last_alert_billing_reset": account.get("billing_cycle_reset"),
+            "alert_active": True,
             "last_alert_at": datetime.now(timezone.utc).isoformat(),
             "last_alert_reason": reason,
-            "last_alert_method": "email+cursor-note",
-            "recipients": sent_to,
+            "last_alert_billing_reset": account.get("billing_cycle_reset"),
+            "last_alert_method": "cursor-only",
         }
     )
-    print(f"Email sent to: {', '.join(sent_to)}")
+    print(f"Cursor alert written ({len(paths)} files): {alert_message(account)}")
     print(f"Reason: {reason}")
     return 0
 
@@ -380,12 +358,12 @@ def clear_tokens_exhausted(account_path: Path = DEFAULT_ACCOUNT_JSON) -> None:
     account_path.write_text(json.dumps(account, indent=2) + "\n", encoding="utf-8")
     if STATE_FILE.exists():
         STATE_FILE.unlink()
-    clear_cursor_notes(account_path)
-    print(f"Cleared tokens_exhausted, alert state, and Cursor notes.")
+    clear_all_cursor_notes(account_path)
+    print("Cleared tokens_exhausted, alert state, and all Cursor alert/undo notes.")
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="Send Cursor spend-limit alert emails.")
+    parser = argparse.ArgumentParser(description="Cursor-only spend-limit alerts.")
     parser.add_argument(
         "--account-json",
         type=Path,
@@ -395,10 +373,10 @@ def main() -> int:
     parser.add_argument(
         "--check",
         action="store_true",
-        help="Evaluate quota and send alert if tokens/spend limit exhausted",
+        help="Evaluate quota and write or undo Cursor alert",
     )
-    parser.add_argument("--force", action="store_true", help="Send even if already alerted this cycle")
-    parser.add_argument("--dry-run", action="store_true", help="Print actions without sending email")
+    parser.add_argument("--force", action="store_true", help="Rewrite alert even if already active")
+    parser.add_argument("--dry-run", action="store_true", help="Print actions without writing files")
     parser.add_argument(
         "--mark-exhausted",
         action="store_true",
@@ -407,7 +385,7 @@ def main() -> int:
     parser.add_argument(
         "--clear",
         action="store_true",
-        help="Clear tokens_exhausted flag and alert dedupe state after limit increase",
+        help="Clear tokens_exhausted flag and all Cursor alert/undo files",
     )
     args = parser.parse_args()
 

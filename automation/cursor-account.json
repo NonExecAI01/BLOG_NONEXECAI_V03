@@ -22,18 +22,22 @@
     "06:00 DAWN",
     "16:00 AFTERNOON"
   ],
-  "spend_limit_alerts": {
-    "recipients": [
-      "et@edgephone.ai",
-      "et@non-exec.ai"
-    ],
-    "subject": "INCREASE SPEND LIMIT ON CURSOR",
+  "cursor_alerts": {
     "message": "INCREASE SPEND LIMIT ON CURSOR",
-    "from_email": "Non-Exec.AI Alerts <alerts@non-exec.ai>",
-    "cursor_fallback": {
-      "rule": ".cursor/rules/spend-limit-alert.mdc",
-      "note": "automation/CURSOR-SPEND-LIMIT-NOTE.md",
-      "always_when_exhausted": true
-    }
+    "undo_message": "UNDO - CURSOR SPEND LIMIT RESOLVED",
+    "trigger": {
+      "api_percent": 100,
+      "total_percent": 100,
+      "on_demand_spent_usd": 20
+    },
+    "undo": {
+      "api_percent_below": 90,
+      "total_percent_below": 90,
+      "on_demand_spent_usd_below": 15
+    },
+    "cursor_rule": ".cursor/rules/spend-limit-alert.mdc",
+    "cursor_note": "automation/CURSOR-SPEND-LIMIT-NOTE.md",
+    "cursor_undo_rule": ".cursor/rules/spend-limit-resolved.mdc",
+    "cursor_undo_note": "automation/CURSOR-SPEND-LIMIT-RESOLVED.md"
   }
 }
