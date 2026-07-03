@@ -15,9 +15,11 @@
     "Create and save all 4 Cursor Automations while signed in as et@edgephone.ai",
     "Enable Cloud Agent on each automation (uses API quota — currently 94% included)",
     "API at 94%: next runs may consume on-demand budget ($20/mo cap) after included limit",
-    "Cost alerts: Cursor rule + undo only — email cancelled (see cursor_alerts.email_enabled)"
+    "Cost alerts: Cursor rule + undo only — email cancelled (see cursor_alerts.email_enabled)",
+    "Runner: Cursor Cloud only — GitHub Actions governance/quota schedules disabled"
   ],
   "automations_owner": "et@edgephone.ai",
+  "runner": "cursor-cloud-only",
   "git_repo": "NonExecAI01/BLOG_NONEXECAI_V03",
   "schedule_gmt": [
     "06:00 DAWN",

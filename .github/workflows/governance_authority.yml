@@ -1,13 +1,9 @@
-# Governance Authority Agent — GitHub Actions runner
-# Runs at 06:00 and 16:00 UTC when Cursor Cloud Automations are not yet saved.
-# Primary automation: import prefills from aimodelpromptneai/automation/prefill/
+# DISABLED — governance runs on Cursor Cloud Automations only (et@edgephone.ai).
+# Manual emergency run: Actions -> Governance Authority Agent -> Run workflow
 
 name: Governance Authority Agent
 
 on:
-  schedule:
-    - cron: '0 6,16 * * *'
-
   workflow_dispatch:
     inputs:
       phase:
@@ -29,44 +25,7 @@ permissions:
 
 jobs:
   governance-run:
+    if: false
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          fetch-depth: 0
-
-      - name: Set up Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-          cache: 'pip'
-
-      - name: Install dependencies
-        run: pip install --upgrade pip && pip install -r requirements.txt
-
-      - name: Run governance phase
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          SITE_URL: ${{ secrets.SITE_URL }}
-          GOVERNANCE_PHASE: ${{ github.event.inputs.phase || 'auto' }}
-        run: python run_governance_phase.py
-
-      - name: Check Cursor quota and write alert if tokens exhausted
-        run: python notify_spend_limit.py --check
-        continue-on-error: true
-
-      - name: Commit governance outputs
-        run: |
-          git config --global user.name  "NonExecAI Governance Bot"
-          git config --global user.email "bot@non-exec.ai"
-          git add registry/ content/ reports/ briefings/ reference-index.md llms.txt meta/ "NonExecAI Cost Cycling/" automation/ .cursor/rules/spend-limit-alert.mdc .cursor/rules/spend-limit-resolved.mdc 2>/dev/null || true
-          if git diff --staged --quiet; then
-            echo "No governance file changes to commit."
-          else
-            PHASE=$(python -c "from run_governance_phase import current_phase; print(current_phase())")
-            DATE=$(date -u '+%Y-%m-%d')
-            git commit -m "Governance agent ${PHASE} run: ${DATE} [skip ci]"
-            git push origin main
-          fi
+      - run: echo "Disabled — use Cursor Cloud Automations on et@edgephone.ai"
