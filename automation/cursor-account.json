@@ -4,12 +4,12 @@
   "plan_cost_usd_monthly": 60,
   "billing_cycle_reset": "2026-07-29",
   "on_demand_limit_usd": 20,
-  "on_demand_spent_usd": 20,
+  "on_demand_spent_usd": 0,
   "usage_snapshot_date": "2026-07-03",
   "usage_included_percent": {
     "total": 48,
     "auto": 35,
-    "api": 100
+    "api": 94
   },
   "notes": [
     "Create and save all 4 Cursor Automations while signed in as et@edgephone.ai",
