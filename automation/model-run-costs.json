@@ -14,7 +14,8 @@
   "notes": [
     "Cursor Automations run on et@edgephone.ai Pro+ account",
     "API included usage at 94% — monitor on-demand before heavy AFTERNOON Opus runs",
-    "Amortized plan cost per governance run (2/day): ~USD 1.00 included allocation"
+    "Amortized plan cost per governance run (2/day): ~USD 1.00 included allocation",
+    "Cost alerts: Cursor rule + undo only — email cancelled (cursor_alerts.email_enabled=false)"
   ],
   "currency": "USD",
   "schedule": "06:00 + 16:00 GMT (DAWN + AFTERNOON)",

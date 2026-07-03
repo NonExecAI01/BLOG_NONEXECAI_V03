@@ -13,8 +13,9 @@
   },
   "notes": [
     "Create and save all 4 Cursor Automations while signed in as et@edgephone.ai",
-    "Enable Cloud Agent on each automation (uses API quota \u00e2\u20ac\u201d currently 94% included)",
-    "API at 94%: next runs may consume on-demand budget ($20/mo cap) after included limit"
+    "Enable Cloud Agent on each automation (uses API quota — currently 94% included)",
+    "API at 94%: next runs may consume on-demand budget ($20/mo cap) after included limit",
+    "Cost alerts: Cursor rule + undo only — email cancelled (see cursor_alerts.email_enabled)"
   ],
   "automations_owner": "et@edgephone.ai",
   "git_repo": "NonExecAI01/BLOG_NONEXECAI_V03",
@@ -23,6 +24,8 @@
     "16:00 AFTERNOON"
   ],
   "cursor_alerts": {
+    "channel": "cursor-only",
+    "email_enabled": false,
     "message": "INCREASE SPEND LIMIT ON CURSOR",
     "undo_message": "UNDO - CURSOR SPEND LIMIT RESOLVED",
     "trigger": {
