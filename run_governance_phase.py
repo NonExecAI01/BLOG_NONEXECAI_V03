@@ -68,8 +68,17 @@ def main() -> int:
         f"- Registry entries on disk: {count}\n"
         f"- Primary automation: Cursor Cloud (8 prefills in aimodelpromptneai)\n",
     )
+
+    from log_cycle_cost import append_cost_line, daily_total_for_date
+
+    run_notes = os.environ.get("GITHUB_RUN_ID", "")
+    note = f"github run {run_notes}" if run_notes else "scheduled"
+    append_cost_line(phase, runner="github-actions", notes=note)
+    day_total = daily_total_for_date()
+
     print(f"Governance phase: {phase}")
     print(f"Registry entries: {count}")
+    print(f"Cost logged. Daily total: USD {day_total:.2f}")
     return 0
 
 

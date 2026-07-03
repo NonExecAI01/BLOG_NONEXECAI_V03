@@ -1,0 +1,32 @@
+{
+  "currency": "USD",
+  "note": "Estimated per-run costs for prompt cycling. Update when Cursor pricing changes. Cursor runs use configured model; GitHub Actions uses Gemini.",
+  "runners": {
+    "cursor-cloud": "Cursor Cloud Agent automation",
+    "github-actions": "GitHub Actions governance runner (Gemini)"
+  },
+  "models": {
+    "composer-2.5-fast": { "label": "Composer 2.5 Fast", "est_usd": 0.15 },
+    "claude-opus-4-8-thinking-high": { "label": "Opus 4.8 High", "est_usd": 1.5 },
+    "gpt-5.5-medium": { "label": "GPT-5.5 Medium", "est_usd": 0.8 },
+    "claude-fable-5-thinking-high": { "label": "Fable 5 High", "est_usd": 1.0 },
+    "claude-sonnet-5-thinking-high": { "label": "Sonnet 5 High", "est_usd": 0.9 },
+    "claude-4.6-sonnet-medium-thinking": { "label": "Sonnet 4.6 Medium", "est_usd": 0.5 },
+    "gpt-5.3-codex": { "label": "Codex 5.3 Medium", "est_usd": 0.7 },
+    "gemini-2.5-flash": { "label": "Gemini 2.5 Flash", "est_usd": 0.02 }
+  },
+  "phase_model_map": {
+    "odd": {
+      "MIDNIGHT": "composer-2.5-fast",
+      "DAWN": "claude-opus-4-8-thinking-high",
+      "NOON": "gpt-5.5-medium",
+      "DUSK": "claude-fable-5-thinking-high"
+    },
+    "even": {
+      "MIDNIGHT": "claude-sonnet-5-thinking-high",
+      "DAWN": "claude-4.6-sonnet-medium-thinking",
+      "NOON": "gpt-5.3-codex",
+      "DUSK": "composer-2.5-fast"
+    }
+  }
+}

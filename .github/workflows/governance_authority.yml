@@ -59,7 +59,7 @@ jobs:
         run: |
           git config --global user.name  "NonExecAI Governance Bot"
           git config --global user.email "bot@non-exec.ai"
-          git add registry/ content/ reports/ briefings/ reference-index.md llms.txt 2>/dev/null || true
+          git add registry/ content/ reports/ briefings/ reference-index.md llms.txt meta/ "NonExecAI Cost Cycling/" automation/ 2>/dev/null || true
           if git diff --staged --quiet; then
             echo "No governance file changes to commit."
           else
